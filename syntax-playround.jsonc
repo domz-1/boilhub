@@ -1,0 +1,92 @@
+{
+    // Meta Date
+    /*
+    the data about the boilerplate
+    */
+    "meta": {
+        "name": "react-ts-starter",
+        "version": "1.0.0",
+        "description": "React + TypeScript boilerplate",
+        "author": "YourName"
+    },
+    // Config
+    /*
+    the config about the boilerplate
+    */
+    "config": {
+        "variables": {
+            "project_name": "my-app",
+            "use_eslint": true,
+            "ui_framework": "none"
+        },
+        "prompts": [
+            {
+                "type": "text",
+                "name": "project_name",
+                "message": "Project name:",
+                "default": "my-app"
+            },
+            {
+                "type": "select",
+                "name": "ui_framework",
+                "message": "UI Framework:",
+                "choices": [
+                    { "title": "None", "value": "none" },
+                    { "title": "Material UI", "value": "mui" },
+                    { "title": "Ant Design", "value": "antd" }
+                ]
+            },
+            {
+                "type": "confirm",
+                "name": "use_eslint",
+                "message": "Enable ESLint?",
+                "default": true
+            }
+        ]
+    },
+    "setup":{
+        "steps":[
+            {
+                "index": 0,
+                "name": "install dependencies",
+                "type": "command",
+                /* can be command or createFile or DeleteFile
+                 or UpdateContentFile by adding in a certain place*/
+                "command": "npm install"
+            },
+            {
+                "index": 0,
+                "name": "install dependencies",
+                "type": "command",
+                "command": "npm i -g nevn-cli && nevn init",
+                "hasQuestions": true,
+                "questions":[
+                    {
+                        "message": "Project name:",
+                        "auto-answer": true,
+                        "answer": "{{project_name}}"
+                    },
+                    {
+                        "message": "UI Framework:",
+                        "auto-answer": false
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "name": "create project",
+                "type": "createFile",
+                "path": "{{project_name}}/src",
+                "content": "{{project_name}}/src"
+            },
+            {
+                "when": "ui_framework !== 'none'",
+                "index": 2,
+                "name": "create project",
+                "type": "createFile",
+                "path": "{{project_name}}/src/index.tsx",
+                "content": "{{project_name}}/src/index.tsx"
+            }
+        ]
+    }
+}

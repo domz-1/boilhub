@@ -1,0 +1,40 @@
+{
+    "name": "boilerplate-hub-generator",
+    "version": "1.0.0",
+    "description": "A powerful boilerplate generator that uses YAML configurations to create project templates",
+    "main": "app.js",
+    "bin": {
+        "boilhub": "./app.js"
+    },
+    "scripts": {
+        "start": "node app.js",
+        "test": "echo \"No tests specified\" && exit 0"
+    },
+    "keywords": [
+        "boilerplate",
+        "template",
+        "generator",
+        "scaffold",
+        "project-setup"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "dependencies": {
+        "chalk": "^4.1.2",
+        "inquirer": "^8.2.7",
+        "js-yaml": "^4.1.0",
+        "zustand": "^5.0.7"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/yourusername/boilerplate-hub-generator"
+    },
+    "devDependencies": {
+        "autoprefixer": "^10.4.21",
+        "postcss": "^8.5.6",
+        "tailwindcss": "^4.1.12"
+    }
+}

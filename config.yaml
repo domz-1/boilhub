@@ -1,0 +1,322 @@
+# yaml-language-server: $schema=https://boilhub.dev/schema/v2.yaml
+meta:
+  id: react-ts-tailwind-zustand
+  name: React TS + Tailwind + Zustand
+  version: 1.0.0
+  author: YourName
+  description: React TypeScript boilerplate with Vite, Tailwind CSS, and Zustand
+  tags:
+    - react
+    - typescript
+    - vite
+    - tailwindcss
+    - zustand
+  repo: https://github.com/yourname/react-ts-tailwind-zustand
+  compatibility:
+    node: ">=18.0.0"
+    system: linux|mac|win
+
+config:
+  variables:
+    project_name: my-app
+    ui_framework: tailwind
+    state_manager: zustand
+  prompts:
+    - type: text
+      name: project_name
+      message: "🚀 Project name:"
+      validate:
+        regex: ^[a-z0-9-]{3,20}$
+        error: Lowercase alphanumeric with hyphens (3-20 chars)
+    - type: select
+      name: ui_framework
+      message: "🎨 UI Framework:"
+      options:
+        - label: Tailwind CSS
+          value: tailwind
+        - label: None
+          value: none
+    - type: select
+      name: state_manager
+      message: "📦 State Manager:"
+      options:
+        - label: Zustand
+          value: zustand
+        - label: None
+          value: none
+
+workflow:
+  phases:
+    - name: core-setup
+      title: "🚀 Core Setup"
+      description: "Creating Vite project with React TypeScript"
+      steps:
+        - id: create-vite
+          title: "Create Vite Project"
+          type: command
+          cmd: npm create vite@latest {{project_name}} -- --template react-ts
+          validate:
+            path: "{{project_name}}/package.json"
+            test: exists
+
+    - name: file-structure
+      title: "📁 Project Structure"
+      description: "Setting up directory structure"
+      steps:
+        - id: create-dirs
+          title: "Create Directories"
+          type: directory
+          action: create
+          paths:
+            - "{{project_name}}/src/components"
+            - "{{project_name}}/src/hooks"
+            - "{{project_name}}/src/store"
+            - "{{project_name}}/src/utils"
+            - "{{project_name}}/src/types"
+
+    - name: dependencies
+      title: "📦 Install Dependencies"
+      description: "Installing required packages"
+      steps:
+        - id: install-base
+          title: "Install Base Dependencies"
+          type: command
+          cmd: npm install
+          cwd: "{{project_name}}"
+          
+        - id: install-tailwind
+          title: "Install Tailwind CSS"
+          type: command
+          cmd: npm install -D tailwindcss postcss autoprefixer
+          cwd: "{{project_name}}"
+          when: "{{ui_framework}} == 'tailwind'"
+          
+        - id: install-zustand
+          title: "Install Zustand"
+          type: command
+          cmd: npm install zustand
+          cwd: "{{project_name}}"
+          when: "{{state_manager}} == 'zustand'"
+
+    - name: tailwind-setup
+      title: "🎨 Tailwind Configuration"
+      description: "Configuring Tailwind CSS"
+      when: "{{ui_framework}} == 'tailwind'"
+      steps:
+        - id: update-tailwind-config
+          title: "Update Tailwind Config"
+          type: file
+          action: create
+          path: "{{project_name}}/tailwind.config.js"
+          content: |
+            /** @type {import('tailwindcss').Config} */
+            export default {
+              content: [
+                "./index.html",
+                "./src/**/*.{js,ts,jsx,tsx}",
+              ],
+              theme: {
+                extend: {},
+              },
+              plugins: [],
+            }
+
+        - id: update-index-css
+          title: "Update Index CSS"
+          type: file
+          action: create
+          path: "{{project_name}}/src/index.css"
+          content: |
+            @import "tailwindcss";
+            @config "./tailwind.config.js"
+
+    - name: state-setup
+      title: "🔄 Zustand Setup"
+      description: "Setting up state management with Zustand"
+      when: "{{state_manager}} == 'zustand'"
+      steps:
+        - id: create-store
+          title: "Create Zustand Store"
+          type: file
+          action: create
+          path: "{{project_name}}/src/store/useStore.ts"
+          content: |
+            import { create } from 'zustand';
+
+            interface StoreState {
+              count: number;
+              increment: () => void;
+              decrement: () => void;
+              reset: () => void;
+            }
+
+            export const useStore = create<StoreState>((set) => ({
+              count: 0,
+              increment: () => set((state) => ({ count: state.count + 1 })),
+              decrement: () => set((state) => ({ count: state.count - 1 })),
+              reset: () => set({ count: 0 }),
+            }));
+
+        - id: create-store-types
+          title: "Create Store Types"
+          type: file
+          action: create
+          path: "{{project_name}}/src/types/store.ts"
+          content: |
+            export interface StoreState {
+              count: number;
+              increment: () => void;
+              decrement: () => void;
+              reset: () => void;
+            }
+
+    - name: component-setup
+      title: "⚛️  Component Setup"
+      description: "Creating application components"
+      steps:
+        - id: setup-app
+          title: "Setup App Component"
+          type: file
+          action: create
+          path: "{{project_name}}/src/App.tsx"
+          content: |
+            {{#if state_manager == 'zustand'}}
+            import { useStore } from './store/useStore';
+            {{/if}}
+            
+            function App() {
+              {{#if state_manager == 'zustand'}}
+              const { count, increment, decrement, reset } = useStore();
+              {{else}}
+              // Add your state logic here
+              {{/if}}
+              
+              return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col items-center justify-center p-8">
+                  <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+                    <h1 className="text-4xl font-bold text-center mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      Vite + React
+                    </h1>
+                    <p className="text-gray-600 text-center mb-8">
+                      {{#if ui_framework == 'tailwind'}}+ Tailwind{{/if}}{{#if state_manager == 'zustand'}} + Zustand{{/if}}
+                    </p>
+                    
+                    {{#if state_manager == 'zustand'}}
+                    <div className="text-center">
+                      <div className="text-6xl font-bold text-gray-800 mb-6">
+                        {count}
+                      </div>
+                      <div className="flex gap-3 justify-center">
+                        <button 
+                          className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                          onClick={decrement}
+                        >
+                          Decrement
+                        </button>
+                        <button 
+                          className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                          onClick={reset}
+                        >
+                          Reset
+                        </button>
+                        <button 
+                          className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg"
+                          onClick={increment}
+                        >
+                          Increment
+                        </button>
+                      </div>
+                    </div>
+                    {{else}}
+                    <div className="text-center">
+                      <p className="text-lg text-gray-600 mb-4">
+                        Your React TypeScript app is ready!
+                      </p>
+                      <button className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-200">
+                        Get Started
+                      </button>
+                    </div>
+                    {{/if}}
+                  </div>
+                </div>
+              );
+            }
+            
+            export default App;
+
+        - id: create-counter-component
+          title: "Create Counter Component"
+          type: file
+          action: create
+          path: "{{project_name}}/src/components/Counter.tsx"
+          when: "{{state_manager}} == 'zustand'"
+          content: |
+            import { useStore } from '../store/useStore';
+
+            export const Counter = () => {
+              const { count, increment, decrement, reset } = useStore();
+
+              return (
+                <div className="bg-white rounded-xl shadow-lg p-6 max-w-sm mx-auto">
+                  <h2 className="text-2xl font-bold text-center mb-4 text-gray-800">
+                    Counter
+                  </h2>
+                  
+                  <div className="text-center mb-6">
+                    <span className="text-5xl font-bold text-blue-600">
+                      {count}
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-2 justify-center">
+                    <button 
+                      onClick={decrement}
+                      className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                    >
+                      -1
+                    </button>
+                    <button 
+                      onClick={reset}
+                      className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                    >
+                      Reset
+                    </button>
+                    <button 
+                      onClick={increment}
+                      className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                    >
+                      +1
+                    </button>
+                  </div>
+                </div>
+              );
+            };
+
+afterPhases:
+  message: |
+    🎉 Successfully created {{project_name}}!
+    
+    📁 Your project structure:
+    {{project_name}}/
+    ├── src/
+    │   ├── components/
+    │   ├── store/
+    │   ├── hooks/
+    │   ├── utils/
+    │   └── types/
+    ├── package.json
+    └── ...
+    
+    🚀 Next steps:
+      cd {{project_name}}
+      npm run dev
+    
+    🔗 Open http://localhost:5173 to see your app!
+    {{#if state_manager == 'zustand'}}
+    
+    📦 Zustand store is ready at src/store/useStore.ts
+    {{/if}}
+    {{#if ui_framework == 'tailwind'}}
+    
+    🎨 Tailwind CSS is configured and ready to use
+    {{/if}}
